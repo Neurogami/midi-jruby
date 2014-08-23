@@ -1,3 +1,5 @@
 .loadpath
 .project
 midi-jruby.gemspec
+.rvmrc
+pkg

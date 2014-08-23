@@ -28,24 +28,24 @@ module MIDIJRuby
         to_return
       end
       
-      def send(msg, timestamp = -1)
-        if msg.respond_to?(:get_packed_msg)
+      def send msg, timestamp = -1
+        if msg.respond_to? :get_packed_msg
           m = msg.get_packed_msg
           @buf << unpack(m)
         else
-          str = String.from_java_bytes(msg.get_data)
-          arr = str.unpack("C" * str.length)
-          arr.insert(0, msg.get_status)
+          str = String.from_java_bytes msg.get_data
+          arr = str.unpack "C" * str.length
+          arr.insert 0, msg.get_status
           @buf << arr 
         end
       end      
       
       private
       
-      def unpack(msg)
+      def unpack msg
         # there's probably a better way of doing this
         o = []
-        s = msg.to_s(16)
+        s = msg.to_s 16
         s = "0" + s if s.length.divmod(2).last > 0
         while s.length > 0 
           o << s.slice!(0,2).hex
@@ -92,17 +92,17 @@ module MIDIJRuby
     alias_method :gets_hex, :gets_s
 
     # enable this the input for use; can be passed a block
-    def enable(options = {}, &block)
+    def enable options = {}, &block
       @device.open
       @transmitter = @device.get_transmitter
-      @transmitter.set_receiver(InputReceiver.new)
+      @transmitter.set_receiver InputReceiver.new
       initialize_buffer
       @start_time = Time.now.to_f
       spawn_listener!
       @enabled = true
       if block_given?
         begin
-          block.call(self)
+          block.call self
         ensure
           close
         end
@@ -122,17 +122,23 @@ module MIDIJRuby
     end
     
     def self.first
-      Device.first(:input)  
+      Device.first :input
     end
 
     def self.last
-      Device.last(:input) 
+      Device.last :input 
     end
     
     def self.all
       Device.all_by_type[:input]
     end
     
+
+  
+    def self.[] i
+      Device.all_by_type[:input][i]
+    end
+
     private
     
     def initialize_buffer
@@ -145,7 +151,7 @@ module MIDIJRuby
     end
     
     def now
-      ((Time.now.to_f - @start_time) * 1000)
+      (Time.now.to_f - @start_time) * 1000
     end
     
     # give a message its timestamp and package it in a Hash
@@ -154,7 +160,7 @@ module MIDIJRuby
     end
     
     def queued_messages
-      @buffer.slice(@pointer, @buffer.length - @pointer)
+      @buffer.slice @pointer, @buffer.length - @pointer
     end
     
     def queued_messages?
@@ -166,7 +172,7 @@ module MIDIJRuby
       @listener = Thread.fork do
         while true          
           while (msgs = poll_system_buffer).empty?
-            sleep(1.0/1000)
+            sleep 1.0/1000
           end
           populate_local_buffer(msgs) unless msgs.empty?
         end
@@ -177,11 +183,11 @@ module MIDIJRuby
       @transmitter.get_receiver.read
     end
     
-    def populate_local_buffer(msgs)
+    def populate_local_buffer msgs
       msgs.each { |raw| @buffer << get_message_formatted(raw, now) unless raw.nil? }
     end
     
-    def numeric_bytes_to_hex_string(bytes)
+    def numeric_bytes_to_hex_string bytes
       bytes.map { |b| s = b.to_s(16).upcase; b < 16 ? s = "0" + s : s; s }.join
     end   
    

@@ -14,7 +14,7 @@ In the interest of allowing people on other platforms to utilize your code, you 
 
 == Install
 
-* gem install midi-jruby
+* gem install midi-jruby --source http://gems.neurogami.com
 
 == Usage 
 
@@ -39,7 +39,7 @@ Use
 
 == Documentation
 
-* {rdoc}[http://rdoc.info/gems/midi-jruby]
+* {rdoc}[http://ruby-doc.org/gems/docs/m/midi-jruby-0.0.12//]
 
 == Author 
 

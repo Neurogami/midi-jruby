@@ -25,7 +25,7 @@ module MIDIJRuby
 
     alias_method :enabled?, :enabled
     
-    def initialize(id, device, options = {}, &block)
+    def initialize id, device, options = {}, &block
       @name = options[:name]
       @description = options[:description]
       @vendor = options[:vendor]
@@ -39,13 +39,19 @@ module MIDIJRuby
     end
 
     # select the first device of type <em>type</em>
-    def self.first(type)
+    def self.first type
       all_by_type[type].first
     end
 
     # select the last device of type <em>type</em>
-    def self.last(type)
+    def self.last type
       all_by_type[type].last
+    end
+
+
+    # select the imdexed device of type <em>type</em>
+    def self.[] i
+      all_by_type[type][i]
     end
 
     # a Hash of :input and :output devices
@@ -53,7 +59,7 @@ module MIDIJRuby
       available_devices = { :input => [], :output => [] }
       count = -1
       MidiSystem.get_midi_device_info.each do |info|
-        device = MidiSystem.get_midi_device(info)
+        device = MidiSystem.get_midi_device info
         opts = { :name => info.get_name, 
                  :description => info.get_description, 
                  :vendor => info.get_vendor }
